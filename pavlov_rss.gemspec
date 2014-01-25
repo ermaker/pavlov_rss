@@ -23,5 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "rspec-mocks"
   spec.add_development_dependency "guard"
-  spec.add_development_dependency "recursive-open-struct"
+  spec.add_development_dependency "fakeweb", ["~> 1.3"]
 end

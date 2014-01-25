@@ -1,6 +1,6 @@
 require 'rss'
 require 'open-uri'
-require 'recursive-open-struct'
+require 'fakeweb'
 
 require "pavlov_rss/version"
 

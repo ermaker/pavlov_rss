@@ -18,6 +18,6 @@ end
 
 require File.expand_path(File.dirname(__FILE__) + '/../lib/pavlov_rss')
 
-def load_sample()
-	File.read('./sample_feeds/sample.xml')
+def sample_feed
+	File.read("#{File.dirname(__FILE__)}/sample_feeds/sample.xml")
 end

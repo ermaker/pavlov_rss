@@ -2,17 +2,17 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe PavlovRss::Reader do
 	before :each do
-		feed = RecursiveOpenStruct.new({channel: {title: "ChannelTitle"}})
-		RSS::Parser.should_receive(:parse).with(anything).and_return(feed)
-		@reader = PavlovRss::Reader.new("http://github.com/jakkdu/pavlov_rss") 	
+		FakeWeb.register_uri(:get, "http://example.com/test1", :body => sample_feed)
+		@reader = PavlovRss::Reader.new("http://example.com/test1") 	
 	end
 
 	describe "#fetch" do
 		before :each do 
 			@feeds = @reader.fetch
 		end
+
 		it "return right channel title" do
-			@feeds.first.channel.title.should eq "ChannelTitle"
+			@feeds.first.channel.title.should eq RSS::Parser.parse(sample_feed).channel.title
 		end
 	end
 end
