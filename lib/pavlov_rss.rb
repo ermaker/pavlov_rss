@@ -1,5 +1,9 @@
+require 'rss'
+require 'open-uri'
+require 'recursive-open-struct'
+
 require "pavlov_rss/version"
 
 module PavlovRss
-  # Your code goes here...
+	autoload :Reader,		'pavlov_rss/reader'
 end
