@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'pavlov_rss'
+require 'fake_web'
 
 describe PavlovRss::Reader do
 	before :each do

@@ -1,6 +1,5 @@
 require 'rss'
 require 'open-uri'
-require 'fakeweb'
 
 require "pavlov_rss/version"
 
