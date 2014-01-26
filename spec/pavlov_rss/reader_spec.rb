@@ -1,4 +1,5 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require 'spec_helper'
+require 'pavlov_rss'
 
 describe PavlovRss::Reader do
 	before :each do
