@@ -1,5 +1,3 @@
-require 'open-uri'
-
 require "pavlov_rss/version"
 
 module PavlovRss
