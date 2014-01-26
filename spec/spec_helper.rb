@@ -4,6 +4,21 @@
 # loaded once.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+if ENV['COVERAGE']
+  require 'simplecov'
+  formatters = [SimpleCov::Formatter::HTMLFormatter]
+  begin
+    puts '[COVERAGE] Running with SimpleCov HTML Formatter'
+    require 'simplecov-rcov-text'
+    formatters << SimpleCov::Formatter::RcovTextFormatter
+    puts '[COVERAGE] Running with SimpleCov Rcov Formatter'
+  rescue LoadError
+    puts '[COVERAGE] SimpleCov Rcov formatter could not be loaded'
+  end
+  SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[ *formatters ]
+  SimpleCov.start
+end
+
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true
   config.run_all_when_everything_filtered = true
