@@ -17,5 +17,5 @@ RSpec.configure do |config|
 end
 
 def sample_feed
-	File.read("#{File.dirname(__FILE__)}/sample_feeds/sample.xml")
+	File.read("#{File.dirname(__FILE__)}/fixtures/sample_feed.xml")
 end
