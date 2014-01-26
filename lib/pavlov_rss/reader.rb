@@ -1,3 +1,5 @@
+require 'rss'
+
 module PavlovRss
 	class Reader
 		def initialize(urls)
