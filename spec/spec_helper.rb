@@ -4,6 +4,21 @@
 # loaded once.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+if ENV['COVERAGE']
+  require 'simplecov'
+  formatters = [SimpleCov::Formatter::HTMLFormatter]
+  begin
+    puts '[COVERAGE] Running with SimpleCov HTML Formatter'
+    require 'simplecov-rcov-text'
+    formatters << SimpleCov::Formatter::RcovTextFormatter
+    puts '[COVERAGE] Running with SimpleCov Rcov Formatter'
+  rescue LoadError
+    puts '[COVERAGE] SimpleCov Rcov formatter could not be loaded'
+  end
+  SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[ *formatters ]
+  SimpleCov.start
+end
+
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true
   config.run_all_when_everything_filtered = true
@@ -16,8 +31,6 @@ RSpec.configure do |config|
   config.order = 'random'
 end
 
-require File.expand_path(File.dirname(__FILE__) + '/../lib/pavlov_rss')
-
 def sample_feed
-	File.read("#{File.dirname(__FILE__)}/sample_feeds/sample.xml")
+	File.read("#{File.dirname(__FILE__)}/fixtures/sample_feed.xml")
 end

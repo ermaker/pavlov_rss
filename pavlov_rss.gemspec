@@ -6,10 +6,10 @@ require 'pavlov_rss/version'
 Gem::Specification.new do |spec|
   spec.name          = "pavlov_rss"
   spec.version       = PavlovRss::VERSION
-  spec.authors       = ["TODO: Write your name"]
-  spec.email         = ["TODO: Write your email address"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.authors       = ["Minwoo Lee", "Insu Yun"]
+  spec.email         = ["ermaker@gmail.com", "wuninsu@gmail.com"]
+  spec.summary       = %q{Pavlov's RSS}
+  spec.description   = %q{}
   spec.homepage      = ""
   spec.license       = "MIT"
 
@@ -21,7 +21,10 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.5"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
-  spec.add_development_dependency "rspec-mocks"
   spec.add_development_dependency "guard"
-  spec.add_development_dependency "fakeweb", ["~> 1.3"]
+  spec.add_development_dependency "guard-rspec"
+  spec.add_development_dependency "fakeweb", "~> 1.3"
+  spec.add_development_dependency "metric_fu"
+  spec.add_development_dependency "simplecov"
+  spec.add_development_dependency "simplecov-rcov-text"
 end
