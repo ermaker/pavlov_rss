@@ -20,15 +20,16 @@ describe PavlovRss::Reader do
 	end
 
   describe "#check" do
-    it "returns [] at first time" do
+    before do
       FakeWeb.register_uri(:get, "http://example.com/rss.xml", body: sample_feed)
       @reader = PavlovRss::Reader.new("http://example.com/rss.xml")
+    end
+
+    it "returns [] at first time" do
 			@reader.check.should be_empty
     end
 
     it "returns [] without changes" do
-      FakeWeb.register_uri(:get, "http://example.com/rss.xml", body: sample_feed)
-      @reader = PavlovRss::Reader.new("http://example.com/rss.xml")
 			@reader.check
 			@reader.check.should be_empty
     end
