@@ -25,5 +25,12 @@ describe PavlovRss::Reader do
       @reader = PavlovRss::Reader.new("http://example.com/rss.xml")
 			@reader.check.should be_empty
     end
+
+    it "returns [] without changes" do
+      FakeWeb.register_uri(:get, "http://example.com/rss.xml", body: sample_feed)
+      @reader = PavlovRss::Reader.new("http://example.com/rss.xml")
+			@reader.check
+			@reader.check.should be_empty
+    end
   end
 end
