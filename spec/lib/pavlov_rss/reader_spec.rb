@@ -27,7 +27,7 @@ describe PavlovRss::Reader do
 
     context "with static rss" do
       before do
-        FakeWeb.register_uri(:get, @url, [{body: feed('rss1.xml')},{body: feed('rss1.xml')},])
+        FakeWeb.register_uri(:get, @url, body: feed('rss1.xml'))
       end
 
       it "returns [] at first time" do
