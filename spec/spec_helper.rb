@@ -31,6 +31,10 @@ RSpec.configure do |config|
   config.order = 'random'
 end
 
+def feed fn
+  File.read(File.join(File.dirname(__FILE__), 'fixtures', fn))
+end
+
 def sample_feed
-	File.read("#{File.dirname(__FILE__)}/fixtures/sample_feed.xml")
+  feed 'sample_feed.xml'
 end
