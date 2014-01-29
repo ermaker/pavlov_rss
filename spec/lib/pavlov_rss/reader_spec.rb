@@ -3,6 +3,10 @@ require 'pavlov_rss'
 require 'fake_web'
 
 describe PavlovRss::Reader do
+  after do
+    FakeWeb.clean_registry
+  end
+
 	describe "#fetch" do
 		before :each do 
       FakeWeb.register_uri(:get, "http://example.com/test1", :body => sample_feed)
