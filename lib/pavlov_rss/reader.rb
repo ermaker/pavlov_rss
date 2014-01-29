@@ -17,5 +17,9 @@ module PavlovRss
 
 			@feeds
 		end
+
+    def check
+      []
+    end
 	end
 end

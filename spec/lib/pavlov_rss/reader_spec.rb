@@ -18,4 +18,12 @@ describe PavlovRss::Reader do
 			@feeds.first.channel.title.should eq RSS::Parser.parse(sample_feed).channel.title
 		end
 	end
+
+  describe "#check" do
+    it "returns [] at first time" do
+      FakeWeb.register_uri(:get, "http://example.com/rss.xml", body: sample_feed)
+      @reader = PavlovRss::Reader.new("http://example.com/rss.xml")
+			@reader.check.should be_empty
+    end
+  end
 end
