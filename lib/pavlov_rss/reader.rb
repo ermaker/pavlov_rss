@@ -17,5 +17,17 @@ module PavlovRss
 
 			@feeds
 		end
+
+    def check
+      now = @urls.map {|url| open(url,&:read)}
+      @prev ||= now
+      if @prev == now
+        result = []
+      else
+        result = :TODO_NOT_IMPLEMENTED
+      end
+      @prev = now
+      return result
+    end
 	end
 end
