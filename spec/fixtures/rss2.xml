@@ -6,10 +6,12 @@
     <description>description</description>
     <item>
       <title>title2</title>
+      <link>http://example.com/title2</link>
       <description>description2</description>
     </item>
     <item>
       <title>title1</title>
+      <link>http://example.com/title1</link>
       <description>description1</description>
     </item>
   </channel>
