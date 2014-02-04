@@ -17,3 +17,10 @@ class RSS::Rss::Channel::Item
       and @link == other.link
   end
 end
+
+class RSS::Rss
+  def eql? other
+    @channel.eql? other.channel \
+      and items.eql? other.items
+  end
+end

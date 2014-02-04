@@ -6,6 +6,36 @@ describe RSS::Rss do
     @rss = RSS::Parser.parse feed('rss1.xml')
   end
 
+  describe "#eql?" do
+    it "returns true with same object" do
+      @rss.should eql @rss
+    end
+
+    it "returns true with different object but same content" do
+      @rss.should eql @rss.dup
+    end
+
+    it "returns false with different channel" do
+      ['channel_title.xml',
+       'channel_link.xml',
+       'channel_description.xml'].each do |fn|
+         @other_rss = RSS::Parser.parse feed(fn)
+
+         @rss.should_not eql @other_rss
+       end
+    end
+
+    it "returns false with different items" do
+      ['item_title.xml',
+       'item_link.xml',
+       'item_description.xml'].each do |fn|
+         @other_rss = RSS::Parser.parse feed(fn)
+
+         @rss.should_not eql @other_rss
+       end
+    end
+  end
+
   describe "Channel#eql?" do
     before :each do
       @channel = @rss.channel
