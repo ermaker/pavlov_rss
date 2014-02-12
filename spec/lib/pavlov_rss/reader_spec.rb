@@ -34,23 +34,62 @@ describe PavlovRss::Reader do
           FakeWeb.register_uri(:get, @url, body: feed('rss1.xml'))
         end
 
-        it "returns [] at first time" do
-          @reader.check.should be_empty
+        it "returns [[]] at first time" do
+          @reader.check.should == [[]]
         end
 
-        it "returns [] without changes" do
+        it "returns [[]] without changes" do
           @reader.check
-          @reader.check.should be_empty
+          @reader.check.should == [[]]
         end
       end
 
-      it "returns not empty with any chagnes" do
+      it "does not return [[]] with any chagnes" do
         FakeWeb.register_uri(:get, @url, [
                              {body: feed('rss1.xml')},
                              {body: feed('rss2.xml')},
         ])
         @reader.check
-        @reader.check.should_not be_empty
+        @reader.check.should_not == [[]]
+      end
+
+      it "returns new items" do
+        FakeWeb.register_uri(:get, @url, [
+                             {body: feed('rss1.xml')},
+                             {body: feed('rss2.xml')},
+                             {body: feed('rss3.xml')},
+                             {body: feed('rss4.xml')},
+                             {body: feed('rss5.xml')},
+        ])
+        @reader.check
+        @reader.check.map{|r|r.map(&:to_xml)}.should == [[<<-EOXML.chomp]]
+<item>
+      <title>title2</title>
+      <link>http://example.com/title2</link>
+      <description>description2</description>
+    </item>
+        EOXML
+        @reader.check.map{|r|r.map(&:to_xml)}.should == [[<<-EOXML.chomp]]
+<item>
+      <title>title3</title>
+      <link>http://example.com/title3</link>
+      <description>description3</description>
+    </item>
+        EOXML
+        @reader.check.map{|r|r.map(&:to_xml)}.should == [[<<-EOXML.chomp]]
+<item>
+      <title>title4</title>
+      <link>http://example.com/title4</link>
+      <description>description4</description>
+    </item>
+        EOXML
+        @reader.check.map{|r|r.map(&:to_xml)}.should == [[<<-EOXML.chomp]]
+<item>
+      <title>title5</title>
+      <link>http://example.com/title5</link>
+      <description>description5</description>
+    </item>
+        EOXML
       end
     end
 

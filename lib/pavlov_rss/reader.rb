@@ -1,5 +1,6 @@
 require 'rss'
 require 'open-uri'
+require 'nokogiri'
 
 module PavlovRss
   class Reader
@@ -19,12 +20,10 @@ module PavlovRss
     end
 
     def check
-      now = @urls.map {|url| open(url,&:read)}
+      now = @urls.map {|url| Nokogiri.XML(open(url,&:read))}
       @prev ||= now
-      if @prev == now
-        result = []
-      else
-        result = :TODO_NOT_IMPLEMENTED
+      result = @prev.zip(now).map do |p,n|
+        new_items p, n
       end
       @prev = now
       return result
