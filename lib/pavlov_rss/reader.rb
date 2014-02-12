@@ -29,5 +29,14 @@ module PavlovRss
       @prev = now
       return result
     end
+
+    def new_items lhs, rhs
+      path = '/rss/channel/item'
+      prev = lhs.xpath(path).map(&:to_xml)
+      now = rhs.xpath(path).reject do |item|
+        prev.include? item.to_xml
+      end
+      return now
+    end
   end
 end
