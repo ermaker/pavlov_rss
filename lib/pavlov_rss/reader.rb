@@ -1,6 +1,7 @@
 require 'rss'
 require 'open-uri'
 require 'nokogiri'
+require 'active_support/core_ext'
 
 module PavlovRss
   class Reader
@@ -29,13 +30,14 @@ module PavlovRss
       return result
     end
 
+    def item_to_json rss
+      result = Hash.from_xml(rss.to_xml)['rss']['channel']['item'] || []
+      return result if result.is_a? Array
+      return [result]
+    end
+
     def new_items lhs, rhs
-      path = '/rss/channel/item'
-      prev = lhs.xpath(path).map(&:to_xml)
-      now = rhs.xpath(path).reject do |item|
-        prev.include? item.to_xml
-      end
-      return now
+      item_to_json(rhs) - item_to_json(lhs)
     end
   end
 end

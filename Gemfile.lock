@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     pavlov_rss (0.0.1)
+      activesupport
       nokogiri
 
 GEM
