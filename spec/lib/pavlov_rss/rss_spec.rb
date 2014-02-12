@@ -93,3 +93,81 @@ describe RSS::Rss do
      end
   end
 end
+
+describe RSS::Rss::Channel::Item do
+  context '#eql?' do
+    it 'returns true if same' do
+      item1, = RSS::Parser.parse(feed('rss1.xml')).items
+      item2, = RSS::Parser.parse(feed('rss1.xml')).items
+      item1.should be_eql item2
+    end
+
+    it 'returns false if not same' do
+      item1, item2= RSS::Parser.parse(feed('rss2.xml')).items
+      item1.should_not be_eql item2
+    end
+  end
+
+  context '#hash' do
+    it 'returns true if same' do
+      item1, = RSS::Parser.parse(feed('rss1.xml')).items
+      item2, = RSS::Parser.parse(feed('rss1.xml')).items
+      item1.should be_eql item2
+      item1.hash.should == item2.hash
+    end
+
+    it 'returns false if not same' do
+      item1, item2= RSS::Parser.parse(feed('rss2.xml')).items
+      item1.hash.should_not == item2.hash
+    end
+  end
+
+  context '#- with arrays' do
+    it 'works' do
+      items1= RSS::Parser.parse(feed('rss1.xml')).items
+      items2= RSS::Parser.parse(feed('rss2.xml')).items
+      result = items2 - items1
+      result.should have(1).items
+      result[0].core_value.should == ["title2", "description2", "http://example.com/title2"]
+    end
+  end
+end
+
+describe RSS::Rss::Channel do
+  context '#eql?' do
+    it 'returns true if same' do
+      channel1 = RSS::Parser.parse(feed('rss1.xml')).channel
+      channel2 = RSS::Parser.parse(feed('rss1.xml')).channel
+      channel1.should be_eql channel2
+    end
+
+    it 'returns false if not same' do
+      channel1 = RSS::Parser.parse(feed('rss1.xml')).channel
+      channel2 = RSS::Parser.parse(feed('channel_title.xml')).channel
+      channel1.should_not be_eql channel2
+    end
+  end
+
+  context '#hash' do
+    it 'returns true if same' do
+      channel1 = RSS::Parser.parse(feed('rss1.xml')).channel
+      channel2 = RSS::Parser.parse(feed('rss1.xml')).channel
+      channel1.hash.should == channel2.hash
+    end
+
+    it 'returns false if not same' do
+      channel1 = RSS::Parser.parse(feed('rss1.xml')).channel
+      channel2 = RSS::Parser.parse(feed('channel_title.xml')).channel
+      channel1.hash.should_not == channel2.hash
+    end
+  end
+end
+
+describe RSS::Rss do
+  context '#-' do
+    rss1 = RSS::Parser.parse feed('rss1.xml')
+    rss2 = RSS::Parser.parse feed('rss2.xml')
+    diff = rss2 - rss1
+    diff.map(&:core_value).should == [["title2", "description2", "http://example.com/title2"]]
+  end
+end

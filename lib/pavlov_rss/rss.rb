@@ -1,26 +1,36 @@
 require 'pavlov_rss'
 require 'rss'
 
-class RSS::Rss::Channel
+module HashEqlWithValues
+  def hash
+    core_value.hash
+  end
   def eql? other
     # only check required elements
-    @title == other.title \
-      and @description == other.description \
-      and @link == other.link
+    core_value.eql? other.core_value
+  end
+end
+
+class RSS::Rss::Channel
+  include HashEqlWithValues
+  def core_value
+    [@title, @description, @link]
   end
 end
 
 class RSS::Rss::Channel::Item
-  def eql? other
-    @title == other.title \
-      and @description == other.description \
-      and @link == other.link
+  include HashEqlWithValues
+  def core_value
+    [@title, @description, @link]
   end
 end
 
 class RSS::Rss
-  def eql? other
-    @channel.eql? other.channel \
-      and items.eql? other.items
+  include HashEqlWithValues
+  def core_value
+    [@channel, items]
+  end
+  def - rhs
+    items - rhs.items
   end
 end
