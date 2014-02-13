@@ -1,4 +1,3 @@
-require 'rss'
 require 'open-uri'
 require 'nokogiri'
 require 'active_support/core_ext'
@@ -7,17 +6,6 @@ module PavlovRss
   class Reader
     def initialize(urls)
       @urls = Array(urls)
-      @feeds = []
-    end
-
-    def fetch(options = {})
-      @urls.each do |url|
-        open(url) do |rss|
-          @feeds <<  RSS::Parser.parse(rss)
-        end
-      end
-
-      @feeds
     end
 
     def check
