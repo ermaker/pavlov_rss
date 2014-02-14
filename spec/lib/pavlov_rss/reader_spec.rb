@@ -121,6 +121,15 @@ describe PavlovRss::Reader do
         result = @reader.item_to_json rss
         result.should == []
       end
+      it "works on atom" do
+        atom = Nokogiri.XML(feed('atom.xml'))
+        result = @reader.item_to_json atom
+        result.should == [{
+          "title"=>"title",
+          "id"=>"tag_string",
+          "content"=>"content"
+        }]
+      end
     end
   end
 

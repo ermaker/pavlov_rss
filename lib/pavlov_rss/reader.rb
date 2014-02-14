@@ -26,7 +26,14 @@ module PavlovRss
     end
 
     def item_to_json rss
-      result = Hash.from_xml(rss.to_xml)['rss']['channel']['item'] || []
+      value = Hash.from_xml(rss.to_xml)
+      result = case
+               when value.has_key?('rss')
+                 value['rss']['channel']['item']
+               when value.has_key?('feed')
+                 value['feed']['entry']
+               end
+      result ||= []
       return result if result.is_a? Array
       return [result]
     end
