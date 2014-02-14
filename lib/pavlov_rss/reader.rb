@@ -4,12 +4,19 @@ require 'active_support/core_ext'
 
 module PavlovRss
   class Reader
-    def initialize(urls)
-      @urls = Array(urls)
+    def initialize(urls_or_lambdas)
+      @lambdas = Array(urls_or_lambdas).map do |url_or_lambda|
+        case url_or_lambda
+        when String
+          lambda {open(url_or_lambda, &:read)}
+        else
+          url_or_lambda
+        end
+      end
     end
 
     def check
-      now = @urls.map {|url| Nokogiri.XML(open(url,&:read))}
+      now = @lambdas.map(&:call).map(&Nokogiri.method(:XML))
       @prev ||= now
       result = @prev.zip(now).map do |p,n|
         new_items p, n

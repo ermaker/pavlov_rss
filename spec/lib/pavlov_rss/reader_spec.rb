@@ -123,4 +123,55 @@ describe PavlovRss::Reader do
       end
     end
   end
+
+  context 'with a labmda' do
+    before do
+      @url = "http://example.com/rss.xml"
+      @reader = PavlovRss::Reader.new lambda { open(@url, &:read) }
+    end
+    describe '#check' do
+      it 'works' do
+        FakeWeb.register_uri(:get, @url, [
+                             {body: feed('rss0.xml')},
+                             {body: feed('rss1.xml')},
+                             {body: feed('rss2.xml')},
+                             {body: feed('rss3.xml')},
+                             {body: feed('rss4.xml')},
+                             {body: feed('rss5.xml')},
+        ])
+        @reader.check
+        @reader.check.should == [[
+          {
+          "title"=>"title1",
+          "link"=>"http://example.com/title1",
+          "description"=>"description1"
+        }]]
+        @reader.check.should == [[
+          {
+          "title"=>"title2",
+          "link"=>"http://example.com/title2",
+          "description"=>"description2"
+        }]]
+        @reader.check.should == [[
+          {
+          "title"=>"title3",
+          "link"=>"http://example.com/title3",
+          "description"=>"description3"
+        }]]
+        @reader.check.should == [[
+          {
+          "title"=>"title4",
+          "link"=>"http://example.com/title4",
+          "description"=>"description4"
+        }]]
+        @reader.check.should == [[
+          {
+          "title"=>"title5",
+          "link"=>"http://example.com/title5",
+          "description"=>"description5"
+        }]]
+        @reader.check.should == [[]]
+      end
+    end
+  end
 end
