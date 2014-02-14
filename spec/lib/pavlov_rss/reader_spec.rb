@@ -8,20 +8,6 @@ describe PavlovRss::Reader do
     FakeWeb.clean_registry
   end
 
-  describe "#fetch" do
-    before :each do
-      @url = "http://example.com/test1"
-      FakeWeb.register_uri(:get, @url, :body => sample_feed)
-      @reader = PavlovRss::Reader.new @url
-      @feeds = @reader.fetch
-    end
-
-    it "return right channel title" do
-      expected_title = RSS::Parser.parse(sample_feed).channel.title
-      @feeds.first.channel.title.should eq expected_title
-    end
-  end
-
   context "with an example reader" do
     before do
       @url = "http://example.com/rss.xml"
@@ -134,6 +120,66 @@ describe PavlovRss::Reader do
         rss = Nokogiri.XML(feed('rss0.xml'))
         result = @reader.item_to_json rss
         result.should == []
+      end
+      it "works on atom" do
+        atom = Nokogiri.XML(feed('atom.xml'))
+        result = @reader.item_to_json atom
+        result.should == [{
+          "title"=>"title",
+          "id"=>"tag_string",
+          "content"=>"content"
+        }]
+      end
+    end
+  end
+
+  context 'with a labmda' do
+    before do
+      @url = "http://example.com/rss.xml"
+      @reader = PavlovRss::Reader.new lambda { open(@url, &:read) }
+    end
+    describe '#check' do
+      it 'works' do
+        FakeWeb.register_uri(:get, @url, [
+                             {body: feed('rss0.xml')},
+                             {body: feed('rss1.xml')},
+                             {body: feed('rss2.xml')},
+                             {body: feed('rss3.xml')},
+                             {body: feed('rss4.xml')},
+                             {body: feed('rss5.xml')},
+        ])
+        @reader.check
+        @reader.check.should == [[
+          {
+          "title"=>"title1",
+          "link"=>"http://example.com/title1",
+          "description"=>"description1"
+        }]]
+        @reader.check.should == [[
+          {
+          "title"=>"title2",
+          "link"=>"http://example.com/title2",
+          "description"=>"description2"
+        }]]
+        @reader.check.should == [[
+          {
+          "title"=>"title3",
+          "link"=>"http://example.com/title3",
+          "description"=>"description3"
+        }]]
+        @reader.check.should == [[
+          {
+          "title"=>"title4",
+          "link"=>"http://example.com/title4",
+          "description"=>"description4"
+        }]]
+        @reader.check.should == [[
+          {
+          "title"=>"title5",
+          "link"=>"http://example.com/title5",
+          "description"=>"description5"
+        }]]
+        @reader.check.should == [[]]
       end
     end
   end

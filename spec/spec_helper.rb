@@ -34,7 +34,3 @@ end
 def feed fn
   File.read(File.join(File.dirname(__FILE__), 'fixtures', fn))
 end
-
-def sample_feed
-  feed 'sample_feed.xml'
-end
