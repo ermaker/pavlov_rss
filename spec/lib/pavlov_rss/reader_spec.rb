@@ -20,23 +20,23 @@ describe PavlovRss::Reader do
           FakeWeb.register_uri(:get, @url, body: feed('rss1.xml'))
         end
 
-        it "returns [[]] at first time" do
-          @reader.check.should == [[]]
+        it "returns [] at first time" do
+          @reader.check.should == []
         end
 
-        it "returns [[]] without changes" do
+        it "returns [] without changes" do
           @reader.check
-          @reader.check.should == [[]]
+          @reader.check.should == []
         end
       end
 
-      it "does not return [[]] with any chagnes" do
+      it "does not return [] with any chagnes" do
         FakeWeb.register_uri(:get, @url, [
                              {body: feed('rss1.xml')},
                              {body: feed('rss2.xml')},
         ])
         @reader.check
-        @reader.check.should_not == [[]]
+        @reader.check.should_not == []
       end
 
       it "returns new items" do
@@ -49,37 +49,37 @@ describe PavlovRss::Reader do
                              {body: feed('rss5.xml')},
         ])
         @reader.check
-        @reader.check.should == [[
+        @reader.check.should == [
           {
           "title"=>"title1",
           "link"=>"http://example.com/title1",
           "description"=>"description1"
-        }]]
-        @reader.check.should == [[
+        }]
+        @reader.check.should == [
           {
           "title"=>"title2",
           "link"=>"http://example.com/title2",
           "description"=>"description2"
-        }]]
-        @reader.check.should == [[
+        }]
+        @reader.check.should == [
           {
           "title"=>"title3",
           "link"=>"http://example.com/title3",
           "description"=>"description3"
-        }]]
-        @reader.check.should == [[
+        }]
+        @reader.check.should == [
           {
           "title"=>"title4",
           "link"=>"http://example.com/title4",
           "description"=>"description4"
-        }]]
-        @reader.check.should == [[
+        }]
+        @reader.check.should == [
           {
           "title"=>"title5",
           "link"=>"http://example.com/title5",
           "description"=>"description5"
-        }]]
-        @reader.check.should == [[]]
+        }]
+        @reader.check.should == []
       end
     end
 
@@ -149,37 +149,37 @@ describe PavlovRss::Reader do
                              {body: feed('rss5.xml')},
         ])
         @reader.check
-        @reader.check.should == [[
+        @reader.check.should == [
           {
           "title"=>"title1",
           "link"=>"http://example.com/title1",
           "description"=>"description1"
-        }]]
-        @reader.check.should == [[
+        }]
+        @reader.check.should == [
           {
           "title"=>"title2",
           "link"=>"http://example.com/title2",
           "description"=>"description2"
-        }]]
-        @reader.check.should == [[
+        }]
+        @reader.check.should == [
           {
           "title"=>"title3",
           "link"=>"http://example.com/title3",
           "description"=>"description3"
-        }]]
-        @reader.check.should == [[
+        }]
+        @reader.check.should == [
           {
           "title"=>"title4",
           "link"=>"http://example.com/title4",
           "description"=>"description4"
-        }]]
-        @reader.check.should == [[
+        }]
+        @reader.check.should == [
           {
           "title"=>"title5",
           "link"=>"http://example.com/title5",
           "description"=>"description5"
-        }]]
-        @reader.check.should == [[]]
+        }]
+        @reader.check.should == []
       end
     end
   end
@@ -200,37 +200,37 @@ describe PavlovRss::Reader do
                              {body: feed('rss5.xml')},
         ])
         @reader.check
-        @reader.check.should == [[
+        @reader.check.should == [
           {
           "title"=>"title1",
           "link"=>"http://example.com/title1",
           "description"=>"description1"
-        }]]
-        @reader.check.should == [[
+        }]
+        @reader.check.should == [
           {
           "title"=>"title2",
           "link"=>"http://example.com/title2",
           "description"=>"description2"
-        }]]
-        @reader.check.should == [[
+        }]
+        @reader.check.should == [
           {
           "title"=>"title3",
           "link"=>"http://example.com/title3",
           "description"=>"description3"
-        }]]
-        @reader.check.should == [[
+        }]
+        @reader.check.should == [
           {
           "title"=>"title4",
           "link"=>"http://example.com/title4",
           "description"=>"description4"
-        }]]
-        @reader.check.should == [[
+        }]
+        @reader.check.should == [
           {
           "title"=>"title5",
           "link"=>"http://example.com/title5",
           "description"=>"description5"
-        }]]
-        @reader.check.should == [[]]
+        }]
+        @reader.check.should == []
       end
     end
   end
