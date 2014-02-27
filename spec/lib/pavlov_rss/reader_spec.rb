@@ -8,7 +8,7 @@ describe PavlovRss::Reader do
     FakeWeb.clean_registry
   end
 
-  context '#hash_to_item' do
+  describe '#hash_to_item' do
     it 'works' do
       empty = {'rss' => {'channel' => {'item' => []}}}
       one = {'rss' => {'channel' => {'item' => [
@@ -21,6 +21,32 @@ describe PavlovRss::Reader do
       subject.hash_to_item(empty).should be_empty
       subject.hash_to_item(one).should have(1).item
       subject.hash_to_item(two).should have(2).items
+    end
+  end
+
+  describe "#rss_to_hash" do
+    it "works on general rss" do
+      rss = Nokogiri.XML(feed('rss2.xml'))
+      result = subject.rss_to_hash rss
+      result.should == {"rss"=>{"version"=>"2.0", "channel"=>{"title"=>"title", "link"=>"http://example.com", "description"=>"description", "item"=>[{"title"=>"title2", "link"=>"http://example.com/title2", "description"=>"description2"}, {"title"=>"title1", "link"=>"http://example.com/title1", "description"=>"description1"}]}}}
+    end
+
+    it "works on 1-item rss" do
+      rss = Nokogiri.XML(feed('rss1.xml'))
+      result = subject.rss_to_hash rss
+      result.should == {"rss" => {"version"=>"2.0", "channel"=>{"title"=>"title", "link"=>"http://example.com", "description"=>"description", "item"=>{"title"=>"title1", "link"=>"http://example.com/title1", "description"=>"description1"}}}}
+    end
+
+    it "works on 0-items rss" do
+      rss = Nokogiri.XML(feed('rss0.xml'))
+      result = subject.rss_to_hash rss
+      result.should == {"rss" => {"version"=>"2.0", "channel"=>{"title"=>"title", "link"=>"http://example.com", "description"=>"description"}}}
+    end
+
+    it "works on atom" do
+      atom = Nokogiri.XML(feed('atom.xml'))
+      result = subject.rss_to_hash atom
+      result.should == {"feed"=>{"xmlns"=>"http://www.w3.org/2005/Atom", "entry"=>{"title"=>"title", "id"=>"tag_string", "content"=>"content"}}}
     end
   end
 
@@ -117,36 +143,6 @@ describe PavlovRss::Reader do
           "title"=>"title2",
           "link"=>"http://example.com/title2",
           "description"=>"description2"
-        }]
-      end
-    end
-
-    describe "#item_to_json" do
-      it "works" do
-        pending
-        rss = Nokogiri.XML(feed('rss1.xml'))
-        result = @reader.item_to_json rss
-        result.should == [
-          {
-          "title"=>"title1",
-          "link"=>"http://example.com/title1",
-          "description"=>"description1"
-        }]
-      end
-      it "works on 0-items rss" do
-        pending
-        rss = Nokogiri.XML(feed('rss0.xml'))
-        result = @reader.item_to_json rss
-        result.should == []
-      end
-      it "works on atom" do
-        pending
-        atom = Nokogiri.XML(feed('atom.xml'))
-        result = @reader.item_to_json atom
-        result.should == [{
-          "title"=>"title",
-          "id"=>"tag_string",
-          "content"=>"content"
         }]
       end
     end
