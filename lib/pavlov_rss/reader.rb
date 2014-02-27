@@ -13,14 +13,6 @@ module PavlovRss
           url_or_lambda
         end
       end
-
-      @feeds = []
-    end
-
-    def fetch(options = {})
-      @lambdas.map(&:call).each do |rss|
-        @feeds <<  RSS::Parser.parse(rss)
-      end
     end
 
     def check
