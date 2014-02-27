@@ -9,44 +9,67 @@ describe PavlovRss::Reader do
   end
 
   describe '#hash_to_item' do
-    it 'works' do
-      empty = {'rss' => {'channel' => {'item' => []}}}
-      one = {'rss' => {'channel' => {'item' => [
-        {'title' => 'title1'},
-      ]}}}
-      two = {'rss' => {'channel' => {'item' => [
-        {'title' => 'title1'},
-        {'title' => 'title2'},
-      ]}}}
-      subject.hash_to_item(empty).should be_empty
-      subject.hash_to_item(one).should have(1).item
-      subject.hash_to_item(two).should have(2).items
+    subject { described_class.new.hash_to_item(hash) }
+
+    describe do
+      let(:hash) do
+        {'rss' => {'channel' => {'item' => []}}}
+      end
+      it { should be_empty }
+    end
+
+    describe do
+      let(:hash) do
+        {'rss' => {'channel' => {'item' =>
+          {'title' => 'title1'}
+        }}}
+      end
+      it { should have(1).item }
+    end
+
+    describe do
+      let(:hash) do
+        {'rss' => {'channel' => {'item' => [
+          {'title' => 'title1'},
+          {'title' => 'title2'},
+        ]}}}
+      end
+      it { should have(2).items }
     end
   end
 
-  describe "#rss_to_hash" do
-    it "works on general rss" do
-      rss = Nokogiri.XML(feed('rss2.xml'))
-      result = subject.rss_to_hash rss
-      result.should == {"rss"=>{"version"=>"2.0", "channel"=>{"title"=>"title", "link"=>"http://example.com", "description"=>"description", "item"=>[{"title"=>"title2", "link"=>"http://example.com/title2", "description"=>"description2"}, {"title"=>"title1", "link"=>"http://example.com/title1", "description"=>"description1"}]}}}
+  describe '#rss_to_hash' do
+    shared_examples 'hashfied rss', :works  do
+      subject { described_class.new.rss_to_hash(Nokogiri.XML(rss)) }
+      it { should == expected }
     end
 
-    it "works on 1-item rss" do
-      rss = Nokogiri.XML(feed('rss1.xml'))
-      result = subject.rss_to_hash rss
-      result.should == {"rss" => {"version"=>"2.0", "channel"=>{"title"=>"title", "link"=>"http://example.com", "description"=>"description", "item"=>{"title"=>"title1", "link"=>"http://example.com/title1", "description"=>"description1"}}}}
+    describe 'works on general rss', :works do
+      let(:rss) { feed('rss2.xml') }
+      let(:expected) do
+        {"rss"=>{"version"=>"2.0", "channel"=>{"title"=>"title", "link"=>"http://example.com", "description"=>"description", "item"=>[{"title"=>"title2", "link"=>"http://example.com/title2", "description"=>"description2"}, {"title"=>"title1", "link"=>"http://example.com/title1", "description"=>"description1"}]}}}
+      end
     end
 
-    it "works on 0-items rss" do
-      rss = Nokogiri.XML(feed('rss0.xml'))
-      result = subject.rss_to_hash rss
-      result.should == {"rss" => {"version"=>"2.0", "channel"=>{"title"=>"title", "link"=>"http://example.com", "description"=>"description"}}}
+    describe 'works on 1-item rss', :works do
+      let(:rss) { feed('rss1.xml') }
+      let(:expected) do
+        {"rss" => {"version"=>"2.0", "channel"=>{"title"=>"title", "link"=>"http://example.com", "description"=>"description", "item"=>{"title"=>"title1", "link"=>"http://example.com/title1", "description"=>"description1"}}}}
+      end
     end
 
-    it "works on atom" do
-      atom = Nokogiri.XML(feed('atom.xml'))
-      result = subject.rss_to_hash atom
-      result.should == {"feed"=>{"xmlns"=>"http://www.w3.org/2005/Atom", "entry"=>{"title"=>"title", "id"=>"tag_string", "content"=>"content"}}}
+    describe 'works on 0-item rss', :works do
+      let(:rss) { feed('rss0.xml') }
+      let(:expected) do
+        {"rss" => {"version"=>"2.0", "channel"=>{"title"=>"title", "link"=>"http://example.com", "description"=>"description"}}}
+      end
+    end
+
+    describe 'works on atom', :works do
+      let(:rss) { feed('atom.xml') }
+      let(:expected) do
+        {"feed"=>{"xmlns"=>"http://www.w3.org/2005/Atom", "entry"=>{"title"=>"title", "id"=>"tag_string", "content"=>"content"}}}
+      end
     end
   end
 
