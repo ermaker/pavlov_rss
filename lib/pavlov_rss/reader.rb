@@ -4,8 +4,8 @@ require 'active_support/core_ext'
 
 module PavlovRss
   class Reader
-    def initialize(url_or_lambda)
-      @lambda =
+    def initialize(url_or_lambda=nil)
+      @opener =
         case url_or_lambda
         when String
           lambda {open(url_or_lambda, &:read)}
@@ -14,8 +14,12 @@ module PavlovRss
         end
     end
 
+    def opener &opener
+      @opener = opener
+    end
+
     def check
-      now = Nokogiri.XML(@lambda.call)
+      now = Nokogiri.XML(@opener.call)
       @prev ||= now
       result = new_items @prev, now
       @prev = now
