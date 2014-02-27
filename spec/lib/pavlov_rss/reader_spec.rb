@@ -8,6 +8,22 @@ describe PavlovRss::Reader do
     FakeWeb.clean_registry
   end
 
+  context '#hash_to_item' do
+    it 'works' do
+      empty = {'rss' => {'channel' => {'item' => []}}}
+      one = {'rss' => {'channel' => {'item' => [
+        {'title' => 'title1'},
+      ]}}}
+      two = {'rss' => {'channel' => {'item' => [
+        {'title' => 'title1'},
+        {'title' => 'title2'},
+      ]}}}
+      subject.hash_to_item(empty).should be_empty
+      subject.hash_to_item(one).should have(1).item
+      subject.hash_to_item(two).should have(2).items
+    end
+  end
+
   context "with an example reader" do
     before do
       @url = "http://example.com/rss.xml"
@@ -107,6 +123,7 @@ describe PavlovRss::Reader do
 
     describe "#item_to_json" do
       it "works" do
+        pending
         rss = Nokogiri.XML(feed('rss1.xml'))
         result = @reader.item_to_json rss
         result.should == [
@@ -117,11 +134,13 @@ describe PavlovRss::Reader do
         }]
       end
       it "works on 0-items rss" do
+        pending
         rss = Nokogiri.XML(feed('rss0.xml'))
         result = @reader.item_to_json rss
         result.should == []
       end
       it "works on atom" do
+        pending
         atom = Nokogiri.XML(feed('atom.xml'))
         result = @reader.item_to_json atom
         result.should == [{

@@ -26,13 +26,16 @@ module PavlovRss
       return result
     end
 
-    def item_to_json rss
-      value = Hash.from_xml(rss.to_xml)
+    def rss_to_hash rss
+      Hash.from_xml(rss.to_xml)
+    end
+
+    def hash_to_item hash
       result = case
-               when value.has_key?('rss')
-                 value['rss']['channel']['item']
+               when hash.has_key?('rss')
+                 hash['rss']['channel']['item']
                when value.has_key?('feed')
-                 value['feed']['entry']
+                 hash['feed']['entry']
                end
       result ||= []
       return result if result.is_a? Array
@@ -40,7 +43,7 @@ module PavlovRss
     end
 
     def new_items lhs, rhs
-      item_to_json(rhs) - item_to_json(lhs)
+      hash_to_item(rss_to_hash(rhs)) - hash_to_item(rss_to_hash(lhs))
     end
   end
 end
