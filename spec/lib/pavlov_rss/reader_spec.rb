@@ -6,14 +6,14 @@ describe PavlovRss::Reader do
   describe '#hash_to_item' do
     subject { described_class.new.hash_to_item(hash) }
 
-    describe do
+    context do
       let(:hash) do
         {'rss' => {'channel' => {'item' => []}}}
       end
       it { should be_empty }
     end
 
-    describe do
+    context do
       let(:hash) do
         {'rss' => {'channel' => {'item' =>
           {'title' => 'title1'}
@@ -22,12 +22,22 @@ describe PavlovRss::Reader do
       it { should have(1).item }
     end
 
-    describe do
+    context do
       let(:hash) do
         {'rss' => {'channel' => {'item' => [
           {'title' => 'title1'},
           {'title' => 'title2'},
         ]}}}
+      end
+      it { should have(2).items }
+    end
+
+    context 'with atom' do
+      let(:hash) do
+        {'feed' => {'entry' => [
+          {'title' => 'title1'},
+          {'title' => 'title2'},
+        ]}}
       end
       it { should have(2).items }
     end

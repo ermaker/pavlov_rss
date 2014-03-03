@@ -28,7 +28,7 @@ module PavlovRss
       result = case
                when hash.has_key?('rss')
                  hash['rss']['channel']['item']
-               when value.has_key?('feed')
+               when hash.has_key?('feed')
                  hash['feed']['entry']
                end
       result ||= []
