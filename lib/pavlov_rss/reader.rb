@@ -4,16 +4,6 @@ require 'active_support/core_ext'
 
 module PavlovRss
   class Reader
-    def initialize(url_or_lambda=nil)
-      @opener =
-        case url_or_lambda
-        when String
-          lambda {open(url_or_lambda, &:read)}
-        else
-          url_or_lambda
-        end
-    end
-
     def opener &opener
       @opener = opener
     end
