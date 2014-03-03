@@ -1,185 +1,203 @@
 require 'spec_helper'
 require 'pavlov_rss'
 require 'nokogiri'
-require 'fake_web'
 
 describe PavlovRss::Reader do
-  after do
-    FakeWeb.clean_registry
+  describe '#hash_to_item' do
+    subject { described_class.new.hash_to_item(hash) }
+
+    describe do
+      let(:hash) do
+        {'rss' => {'channel' => {'item' => []}}}
+      end
+      it { should be_empty }
+    end
+
+    describe do
+      let(:hash) do
+        {'rss' => {'channel' => {'item' =>
+          {'title' => 'title1'}
+        }}}
+      end
+      it { should have(1).item }
+    end
+
+    describe do
+      let(:hash) do
+        {'rss' => {'channel' => {'item' => [
+          {'title' => 'title1'},
+          {'title' => 'title2'},
+        ]}}}
+      end
+      it { should have(2).items }
+    end
   end
 
-  context "with an example reader" do
-    before do
-      @url = "http://example.com/rss.xml"
-      @reader = PavlovRss::Reader.new @url
+  describe '#rss_to_hash' do
+    shared_examples 'hashfied rss', rss_to_hash: :works  do
+      subject { described_class.new.rss_to_hash(Nokogiri.XML(rss)) }
+      it { should == expected }
     end
 
-    describe "#check" do
-      context "with static rss" do
-        before do
-          FakeWeb.register_uri(:get, @url, body: feed('rss1.xml'))
-        end
-
-        it "returns [[]] at first time" do
-          @reader.check.should == [[]]
-        end
-
-        it "returns [[]] without changes" do
-          @reader.check
-          @reader.check.should == [[]]
-        end
-      end
-
-      it "does not return [[]] with any chagnes" do
-        FakeWeb.register_uri(:get, @url, [
-                             {body: feed('rss1.xml')},
-                             {body: feed('rss2.xml')},
-        ])
-        @reader.check
-        @reader.check.should_not == [[]]
-      end
-
-      it "returns new items" do
-        FakeWeb.register_uri(:get, @url, [
-                             {body: feed('rss0.xml')},
-                             {body: feed('rss1.xml')},
-                             {body: feed('rss2.xml')},
-                             {body: feed('rss3.xml')},
-                             {body: feed('rss4.xml')},
-                             {body: feed('rss5.xml')},
-        ])
-        @reader.check
-        @reader.check.should == [[
-          {
-          "title"=>"title1",
-          "link"=>"http://example.com/title1",
-          "description"=>"description1"
-        }]]
-        @reader.check.should == [[
-          {
-          "title"=>"title2",
-          "link"=>"http://example.com/title2",
-          "description"=>"description2"
-        }]]
-        @reader.check.should == [[
-          {
-          "title"=>"title3",
-          "link"=>"http://example.com/title3",
-          "description"=>"description3"
-        }]]
-        @reader.check.should == [[
-          {
-          "title"=>"title4",
-          "link"=>"http://example.com/title4",
-          "description"=>"description4"
-        }]]
-        @reader.check.should == [[
-          {
-          "title"=>"title5",
-          "link"=>"http://example.com/title5",
-          "description"=>"description5"
-        }]]
-        @reader.check.should == [[]]
+    describe 'works on general rss', rss_to_hash: :works do
+      let(:rss) { feed('rss2.xml') }
+      let(:expected) do
+        {'rss'=>{'version'=>'2.0', 'channel'=>{'title'=>'title', 'link'=>'http://example.com', 'description'=>'description', 'item'=>[{'title'=>'title2', 'link'=>'http://example.com/title2', 'description'=>'description2'}, {'title'=>'title1', 'link'=>'http://example.com/title1', 'description'=>'description1'}]}}}
       end
     end
 
-    describe "#new_items" do
-      it "returns empty with same rss" do
-        rss1 = Nokogiri.XML(feed('rss1.xml'))
-        rss2 = Nokogiri.XML(feed('rss1.xml'))
-        items = @reader.new_items rss1, rss2
-        items.should == []
-      end
-
-      it "returns empty with not same rss" do
-        rss1 = Nokogiri.XML(feed('rss1.xml'))
-        rss2 = Nokogiri.XML(feed('rss2.xml'))
-        items = @reader.new_items rss1, rss2
-
-        items.should == [
-          {
-          "title"=>"title2",
-          "link"=>"http://example.com/title2",
-          "description"=>"description2"
-        }]
+    describe 'works on 1-item rss', rss_to_hash: :works do
+      let(:rss) { feed('rss1.xml') }
+      let(:expected) do
+        {'rss' => {'version'=>'2.0', 'channel'=>{'title'=>'title', 'link'=>'http://example.com', 'description'=>'description', 'item'=>{'title'=>'title1', 'link'=>'http://example.com/title1', 'description'=>'description1'}}}}
       end
     end
 
-    describe "#item_to_json" do
-      it "works" do
-        rss = Nokogiri.XML(feed('rss1.xml'))
-        result = @reader.item_to_json rss
-        result.should == [
-          {
-          "title"=>"title1",
-          "link"=>"http://example.com/title1",
-          "description"=>"description1"
-        }]
+    describe 'works on 0-item rss', rss_to_hash: :works do
+      let(:rss) { feed('rss0.xml') }
+      let(:expected) do
+        {'rss' => {'version'=>'2.0', 'channel'=>{'title'=>'title', 'link'=>'http://example.com', 'description'=>'description'}}}
       end
-      it "works on 0-items rss" do
-        rss = Nokogiri.XML(feed('rss0.xml'))
-        result = @reader.item_to_json rss
-        result.should == []
-      end
-      it "works on atom" do
-        atom = Nokogiri.XML(feed('atom.xml'))
-        result = @reader.item_to_json atom
-        result.should == [{
-          "title"=>"title",
-          "id"=>"tag_string",
-          "content"=>"content"
-        }]
+    end
+
+    describe 'works on atom', rss_to_hash: :works do
+      let(:rss) { feed('atom.xml') }
+      let(:expected) do
+        {'feed'=>{'xmlns'=>'http://www.w3.org/2005/Atom', 'entry'=>{'title'=>'title', 'id'=>'tag_string', 'content'=>'content'}}}
       end
     end
   end
 
-  context 'with a labmda' do
-    before do
-      @url = "http://example.com/rss.xml"
-      @reader = PavlovRss::Reader.new lambda { open(@url, &:read) }
+  describe '#fetch' do
+    shared_examples 'fetched rss', fetch: :works do
+      before { subject.opener { rss } }
+      its(:fetch) { should == expected }
     end
-    describe '#check' do
-      it 'works' do
-        FakeWeb.register_uri(:get, @url, [
-                             {body: feed('rss0.xml')},
-                             {body: feed('rss1.xml')},
-                             {body: feed('rss2.xml')},
-                             {body: feed('rss3.xml')},
-                             {body: feed('rss4.xml')},
-                             {body: feed('rss5.xml')},
-        ])
-        @reader.check
-        @reader.check.should == [[
-          {
-          "title"=>"title1",
-          "link"=>"http://example.com/title1",
-          "description"=>"description1"
-        }]]
-        @reader.check.should == [[
-          {
-          "title"=>"title2",
-          "link"=>"http://example.com/title2",
-          "description"=>"description2"
-        }]]
-        @reader.check.should == [[
-          {
-          "title"=>"title3",
-          "link"=>"http://example.com/title3",
-          "description"=>"description3"
-        }]]
-        @reader.check.should == [[
-          {
-          "title"=>"title4",
-          "link"=>"http://example.com/title4",
-          "description"=>"description4"
-        }]]
-        @reader.check.should == [[
-          {
-          "title"=>"title5",
-          "link"=>"http://example.com/title5",
-          "description"=>"description5"
-        }]]
-        @reader.check.should == [[]]
+
+    describe 'works with rss0.xml', fetch: :works do
+      let(:rss) { feed('rss0.xml') }
+      let(:expected) { [] }
+    end
+
+    describe 'works with rss1.xml', fetch: :works do
+      let(:rss) { feed('rss1.xml') }
+      let(:expected) do
+        [
+          {"title"=>"title1", "link"=>"http://example.com/title1", "description"=>"description1"},
+        ]
+      end
+    end
+
+    describe 'works with rss2.xml', fetch: :works do
+      let(:rss) { feed('rss2.xml') }
+      let(:expected) do
+        [
+          {"title"=>"title2", "link"=>"http://example.com/title2", "description"=>"description2"},
+          {"title"=>"title1", "link"=>"http://example.com/title1", "description"=>"description1"},
+        ]
+      end
+    end
+
+    describe 'works with rss3.xml', fetch: :works do
+      let(:rss) { feed('rss3.xml') }
+      let(:expected) do
+        [
+          {"title"=>"title3", "link"=>"http://example.com/title3", "description"=>"description3"},
+          {"title"=>"title2", "link"=>"http://example.com/title2", "description"=>"description2"},
+          {"title"=>"title1", "link"=>"http://example.com/title1", "description"=>"description1"},
+        ]
+      end
+    end
+
+    describe 'works with rss4.xml', fetch: :works do
+      let(:rss) { feed('rss4.xml') }
+      let(:expected) do
+        [
+          {"title"=>"title4", "link"=>"http://example.com/title4", "description"=>"description4"},
+          {"title"=>"title3", "link"=>"http://example.com/title3", "description"=>"description3"},
+          {"title"=>"title2", "link"=>"http://example.com/title2", "description"=>"description2"},
+        ]
+      end
+    end
+
+    describe 'works with rss5.xml', fetch: :works do
+      let(:rss) { feed('rss5.xml') }
+      let(:expected) do
+        [
+          {"title"=>"title5", "link"=>"http://example.com/title5", "description"=>"description5"},
+          {"title"=>"title4", "link"=>"http://example.com/title4", "description"=>"description4"},
+          {"title"=>"title3", "link"=>"http://example.com/title3", "description"=>"description3"},
+        ]
+      end
+    end
+  end
+
+  describe '#check' do
+    shared_examples 'check works', check: :works do
+      before do
+        subject.stub(:fetch).and_return(*fetches)
+        subject.check.should be_empty
+      end
+      its(:check) { should == expected }
+    end
+
+    describe 'works with empty items', check: :works do
+      let(:fetches) { [[], []] }
+      let(:expected) { [] }
+    end
+
+    describe 'works with same items', check: :works do
+      let(:fetches) do
+        [
+          [{'title' => '1'}],
+          [{'title' => '1'}],
+        ]
+      end
+      let(:expected) { [] }
+    end
+
+    describe 'works with added items', check: :works do
+      let(:fetches) do
+        [
+          [],
+          [{'title' => '1'}],
+        ]
+      end
+      let(:expected) { [{'title' => '1'}] }
+    end
+
+    describe 'works with removed items', check: :works do
+      let(:fetches) do
+        [
+          [{'title' => '1'}],
+          [],
+        ]
+      end
+      let(:expected) { [] }
+    end
+
+    describe 'works with various items', check: :works do
+      let(:fetches) do
+        [
+          [
+            {'title' => 'static1'},
+            {'title' => 'static2'},
+            {'title' => 'remove1'},
+            {'title' => 'remove2'},
+          ],
+          [
+            {'title' => 'static1'},
+            {'title' => 'static2'},
+            {'title' => 'add1'},
+            {'title' => 'add2'},
+          ],
+        ]
+      end
+      let(:expected) do
+        [
+          {'title' => 'add1'},
+          {'title' => 'add2'},
+        ]
       end
     end
   end
