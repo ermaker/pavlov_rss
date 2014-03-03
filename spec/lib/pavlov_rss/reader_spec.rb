@@ -47,50 +47,50 @@ describe PavlovRss::Reader do
     describe 'works on general rss', rss_to_hash: :works do
       let(:rss) { feed('rss2.xml') }
       let(:expected) do
-        {"rss"=>{"version"=>"2.0", "channel"=>{"title"=>"title", "link"=>"http://example.com", "description"=>"description", "item"=>[{"title"=>"title2", "link"=>"http://example.com/title2", "description"=>"description2"}, {"title"=>"title1", "link"=>"http://example.com/title1", "description"=>"description1"}]}}}
+        {'rss'=>{'version'=>'2.0', 'channel'=>{'title'=>'title', 'link'=>'http://example.com', 'description'=>'description', 'item'=>[{'title'=>'title2', 'link'=>'http://example.com/title2', 'description'=>'description2'}, {'title'=>'title1', 'link'=>'http://example.com/title1', 'description'=>'description1'}]}}}
       end
     end
 
     describe 'works on 1-item rss', rss_to_hash: :works do
       let(:rss) { feed('rss1.xml') }
       let(:expected) do
-        {"rss" => {"version"=>"2.0", "channel"=>{"title"=>"title", "link"=>"http://example.com", "description"=>"description", "item"=>{"title"=>"title1", "link"=>"http://example.com/title1", "description"=>"description1"}}}}
+        {'rss' => {'version'=>'2.0', 'channel'=>{'title'=>'title', 'link'=>'http://example.com', 'description'=>'description', 'item'=>{'title'=>'title1', 'link'=>'http://example.com/title1', 'description'=>'description1'}}}}
       end
     end
 
     describe 'works on 0-item rss', rss_to_hash: :works do
       let(:rss) { feed('rss0.xml') }
       let(:expected) do
-        {"rss" => {"version"=>"2.0", "channel"=>{"title"=>"title", "link"=>"http://example.com", "description"=>"description"}}}
+        {'rss' => {'version'=>'2.0', 'channel'=>{'title'=>'title', 'link'=>'http://example.com', 'description'=>'description'}}}
       end
     end
 
     describe 'works on atom', rss_to_hash: :works do
       let(:rss) { feed('atom.xml') }
       let(:expected) do
-        {"feed"=>{"xmlns"=>"http://www.w3.org/2005/Atom", "entry"=>{"title"=>"title", "id"=>"tag_string", "content"=>"content"}}}
+        {'feed'=>{'xmlns'=>'http://www.w3.org/2005/Atom', 'entry'=>{'title'=>'title', 'id'=>'tag_string', 'content'=>'content'}}}
       end
     end
   end
 
-  describe "#new_items" do
-    it "returns empty with same rss" do
+  describe '#new_items' do
+    it 'returns empty with same rss' do
       rss1 = Nokogiri.XML(feed('rss1.xml'))
       rss2 = Nokogiri.XML(feed('rss1.xml'))
       items = subject.new_items rss1, rss2
       items.should == []
     end
 
-    it "returns empty with not same rss" do
+    it 'returns empty with not same rss' do
       rss1 = Nokogiri.XML(feed('rss1.xml'))
       rss2 = Nokogiri.XML(feed('rss2.xml'))
       items = subject.new_items rss1, rss2
 
       items.should == [
         {
-        "title"=>"title2",
-        "link"=>"http://example.com/title2",
-        "description"=>"description2"
+        'title'=>'title2',
+        'link'=>'http://example.com/title2',
+        'description'=>'description2'
       }]
     end
   end
@@ -118,7 +118,7 @@ describe PavlovRss::Reader do
   end
 
   describe '#check', :with_example_reader do
-    it "does not return [] with any chagnes" do
+    it 'does not return [] with any chagnes' do
       FakeWeb.register_uri(
         :get, uri, [
           {body: feed('rss1.xml')},
@@ -148,33 +148,33 @@ describe PavlovRss::Reader do
         subject.check.should be_empty
         subject.check.should == [
           {
-          "title"=>"title1",
-          "link"=>"http://example.com/title1",
-          "description"=>"description1"
+          'title'=>'title1',
+          'link'=>'http://example.com/title1',
+          'description'=>'description1'
         }]
         subject.check.should == [
           {
-          "title"=>"title2",
-          "link"=>"http://example.com/title2",
-          "description"=>"description2"
+          'title'=>'title2',
+          'link'=>'http://example.com/title2',
+          'description'=>'description2'
         }]
         subject.check.should == [
           {
-          "title"=>"title3",
-          "link"=>"http://example.com/title3",
-          "description"=>"description3"
+          'title'=>'title3',
+          'link'=>'http://example.com/title3',
+          'description'=>'description3'
         }]
         subject.check.should == [
           {
-          "title"=>"title4",
-          "link"=>"http://example.com/title4",
-          "description"=>"description4"
+          'title'=>'title4',
+          'link'=>'http://example.com/title4',
+          'description'=>'description4'
         }]
         subject.check.should == [
           {
-          "title"=>"title5",
-          "link"=>"http://example.com/title5",
-          "description"=>"description5"
+          'title'=>'title5',
+          'link'=>'http://example.com/title5',
+          'description'=>'description5'
         }]
         subject.check.should == []
       end
