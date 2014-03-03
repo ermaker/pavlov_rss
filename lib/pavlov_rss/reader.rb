@@ -18,8 +18,12 @@ module PavlovRss
       @opener = opener
     end
 
+    def fetch
+      hash_to_item(rss_to_hash(Nokogiri.XML(@opener.call)))
+    end
+
     def check
-      now = hash_to_item(rss_to_hash(Nokogiri.XML(@opener.call)))
+      now = fetch
       @prev ||= now
       result = now - @prev
       @prev = now
