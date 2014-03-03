@@ -73,28 +73,6 @@ describe PavlovRss::Reader do
     end
   end
 
-  describe '#new_items' do
-    it 'returns empty with same rss' do
-      rss1 = Nokogiri.XML(feed('rss1.xml'))
-      rss2 = Nokogiri.XML(feed('rss1.xml'))
-      items = subject.new_items rss1, rss2
-      items.should == []
-    end
-
-    it 'returns empty with not same rss' do
-      rss1 = Nokogiri.XML(feed('rss1.xml'))
-      rss2 = Nokogiri.XML(feed('rss2.xml'))
-      items = subject.new_items rss1, rss2
-
-      items.should == [
-        {
-        'title'=>'title2',
-        'link'=>'http://example.com/title2',
-        'description'=>'description2'
-      }]
-    end
-  end
-
   shared_context 'with an example reader', :with_example_reader do
     let(:uri) { 'http://example.com/rss.xml' }
     subject { described_class.new uri }

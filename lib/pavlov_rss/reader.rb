@@ -19,9 +19,9 @@ module PavlovRss
     end
 
     def check
-      now = Nokogiri.XML(@opener.call)
+      now = hash_to_item(rss_to_hash(Nokogiri.XML(@opener.call)))
       @prev ||= now
-      result = new_items @prev, now
+      result = now - @prev
       @prev = now
       return result
     end
@@ -40,10 +40,6 @@ module PavlovRss
       result ||= []
       return result if result.is_a? Array
       return [result]
-    end
-
-    def new_items lhs, rhs
-      hash_to_item(rss_to_hash(rhs)) - hash_to_item(rss_to_hash(lhs))
     end
   end
 end
