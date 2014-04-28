@@ -12,10 +12,11 @@ module PavlovRss
       hash_to_item(rss_to_hash(Nokogiri.XML(@opener.call)))
     end
 
-    def check
+    def check &blk
       now = fetch
       @prev ||= now
       result = now - @prev
+      result.select!(&blk) if blk
       @prev = now
       return result
     end
