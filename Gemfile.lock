@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pavlov_rss (0.0.4)
+    pavlov_rss (0.0.5)
       activesupport
       nokogiri
 
