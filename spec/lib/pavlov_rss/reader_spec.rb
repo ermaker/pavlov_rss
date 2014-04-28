@@ -230,5 +230,24 @@ describe PavlovRss::Reader do
         item['title'] =~ /^1/
       end.should == expected
     end
+
+    it 'works with nil filter' do
+      fetches = [
+        [],
+        [
+          {'title' => '1-1'},
+          {'title' => '2'},
+          {'title' => '1-2'},
+        ],
+      ]
+      expected = [
+        {'title' => '1-1'},
+        {'title' => '2'},
+        {'title' => '1-2'},
+      ]
+      subject.stub(:fetch).and_return(*fetches)
+      subject.check.should be_empty
+      subject.check(&nil).should == expected
+    end
   end
 end
